@@ -1,44 +1,45 @@
 {
-  "name": "osc_bridge",
+  "name": "p5-local",
   "version": "1.0.3",
-  "description": "A simple app that forwards incoming OSC messages to a static webpage.",
+  "description": "A desktop environment for p5 (or any other JavaScript-based app).",
   "license": "MIT",
   "author": "Yonatan Rozin",
   "type": "commonjs",
-  "main": "main/index.js",
+  "main": "main/dist/index.js",
   "scripts": {
-    "start": "electron ./main/index",
-    "build": "electron-builder build"
-  },
-  "devDependencies": {
-    "electron": "^41.3.0",
-    "electron-builder": "^26.8.1"
+    "start": "electron ./main/dist/index",
+    "build": "electron-builder build",
+    "dev": "concurrently \"tsc --watch\" \"nodemon --watch main/dist --exec electron ./main/dist/index\""
   },
   "build": {
-    "productName": "OSC Bridge",
-    "appId": "com.yonatanrozin.osc_bridge",
-    "files": "main/**/*",
+    "appId": "com.yonatanrozin.p5local",
+    "files": [
+      "main/dist/**/*"
+    ],
     "extraResources": [
       {
         "from": "sketch",
         "to": "sketch"
-      },
-      {
-        "from": "receivers",
-        "to": "receivers"
       }
     ],
-    "directories": {
-      "output": "dist"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
     }
   },
+  "devDependencies": {
+    "@types/electron": "^1.4.38",
+    "concurrently": "^10.0.4",
+    "electron": "^41.3.0",
+    "electron-builder": "^26.15.3",
+    "nodemon": "^3.1.14",
+    "typescript": "^7.0.2"
+  },
   "dependencies": {
-    "node-osc": "^11.5.0"
+    "@serialport/parser-inter-byte-timeout": "^13.0.0",
+    "osc-js": "^2.4.1",
+    "p5-typescript": "^4.3.0",
+    "serialport": "^13.0.0"
   }
 }
