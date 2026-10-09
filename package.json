@@ -1,7 +1,7 @@
 {
-  "name": "p5-local",
+  "name": "javascript-bridge",
   "version": "1.0.3",
-  "description": "A desktop environment for p5 (or any other JavaScript-based app).",
+  "description": "A desktop environment for JavaScript-based applications that enables additional serial and TCP/IP-based communication.",
   "license": "MIT",
   "author": "Yonatan Rozin",
   "type": "commonjs",
@@ -12,7 +12,7 @@
     "dev": "concurrently \"tsc --watch\" \"nodemon --watch main/dist --exec electron ./main/dist/index\""
   },
   "build": {
-    "appId": "com.yonatanrozin.p5local",
+    "appId": "com.yonatanrozin.jsbridge",
     "files": [
       "main/dist/**/*"
     ],
@@ -30,16 +30,16 @@
   },
   "devDependencies": {
     "@types/electron": "^1.4.38",
-    "concurrently": "^10.0.4",
+    "@types/serialport": "^8.0.5",
+    "concurrently": "^10.0.6",
     "electron": "^41.3.0",
-    "electron-builder": "^26.15.3",
+    "electron-builder": "^26.5.0",
     "nodemon": "^3.1.14",
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@serialport/parser-inter-byte-timeout": "^13.0.0",
+    "node-osc": "^11.7.1",
     "osc-js": "^2.4.1",
-    "p5-typescript": "^4.3.0",
     "serialport": "^13.0.0"
   }
 }

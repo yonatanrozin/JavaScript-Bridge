@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OSC Bridge</title>
+    <title>JavaScript Bridge</title>
     <style>
       h1, h3 {margin: 0; padding: 0;}
       tr th {
@@ -13,12 +13,13 @@
     </style>
   </head>
   <body >
-    <h1>OSC Bridge</h1>
+    <h1>JS Bridge OSC + Serial Receiver</h1>
     <h3>By <a href="https://yonatanrozin.com/project/osc-bridge" target="_blank" >Yonatan Rozin</a></h3>
     <p>
-      Send OSC messages to this computer's IP address using port <code>4242</code> and they will appear in the table below.
+      Send OSC messages to this computer's IP address (<code id="ip"></code>) using port <code>4242</code> and they will appear in the table below.
       <br/>Make sure this computer and the sending device are on the same local network!
       <br/>Enter <code>CTRL-I</code> to see your IP address.
+      <br/>Serial data will also appear in the table below. Connect the USB device before opening this app (or refresh with <code>CTRL-R</code>)
     </p>
     <table style="font-family: monospace; border-spacing: 10px;">
       <thead><tr><th>Address</th><th>Args</th></tr></thead>
@@ -29,13 +30,26 @@
       <br/>Copy the files from one of the example sketch folders (not the entire folder!) into this application's sketch folder to try it out.
     </p>
     <script>
-      document.getElementById("IP").textContent = window.localIP;
       const messages = {}
       const table = document.querySelector("tbody");
-      OSC.route("*", (args, addr) => {
+      const OSCReceiver = Bridge.OSC.begin(4242);
+      OSCReceiver.route("*", (args, addr) => {
         messages[addr] = JSON.stringify(args);
-        table.innerHTML = Object.entries(messages).map(([addr, args]) => `<tr><th>${addr}</th><td>${args}</td></tr>`).join("");
+        updateTable();
       });
+      Bridge.Serial.list().then((ports) => {
+        const path = Object.keys(ports)[0];
+        if (!path) return;
+        Bridge.Serial.get(path).begin(9600).onData((msg, buffer) => {
+          messages[`(serial) ${path}`] = `${JSON.stringify(msg)} (${JSON.stringify(buffer)})`;
+          updateTable();
+        });
+      });
+      
+      function updateTable() {
+        table.innerHTML = Object.entries(messages).map(([addr, args]) => `<tr><th>${addr}</th><td>${args}</td></tr>`).join("");
+      }
+      document.getElementById("ip").innerText = Bridge.localIP;
     </script>
   </body>
 </html>

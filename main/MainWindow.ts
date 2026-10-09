@@ -1,5 +1,10 @@
 import { BrowserWindow, type BrowserWindowConstructorOptions, shell, app } from 'electron';
 import path from 'path';
+import os from "os";
+
+const localIP = Object.values(os.networkInterfaces()).flat()
+  .filter((iface) => iface && iface.family === 'IPv4')
+  .map(iface => iface!.address)[0];
 
 export const sketchDir = app.isPackaged
   ? path.join(process.resourcesPath, 'sketch')
@@ -21,6 +26,9 @@ class MainWindow extends BrowserWindow {
       }
       else if (input.type === 'keyDown' && input.key === 'r' && (input.control || input.meta)) {
         this.webContents.reload();
+      }
+      else if (input.type === 'keyDown' && input.key === 'i' && (input.control || input.meta)) {
+        this.webContents.executeJavaScript(`alert("IP Address: ${localIP}")`);
       }
     });
     this.loadFile(`${sketchDir}/index.html`);

@@ -1,8 +1,10 @@
-# OSC Bridge
+# JavaScript Bridge
 
-__Currently in development - functionality NOT guaranteed!!__
+__Currently in development - functionality NOT guaranteed!__
 
-A simple program that runs static HTML/JavaScript files as full-screen desktop applications and enables OSC communication for new networking possibilities.
+_Docs in progress_
+
+A simple program that runs static HTML/JavaScript files as full-screen desktop applications and enables TCP/IP-based communication protocols for new networking possibilities.
 
 ![](https://yonatanrozin.com/wp-content/uploads/2026/06/IMG_8374-1-2.gif)
 
@@ -49,33 +51,58 @@ To build multiple apps (eg. to manage several concurrent projects), each app mus
   - __Editing these files while app is running will refresh the sketch!__
 - Use ```ctrl-F``` to toggle fullscreen
 - Use ```ctrl-R``` to refresh page
-- Use ```ctrl-I``` to display computer's local IP address. Use this IP address and port 4242 when sending OSC messages to this sketch.
+- Use ```ctrl-I``` to show a pop-up with your computer's local IP address. Use this IP address when sending messages to this device over your local network!
 
 ## API
 
-__This API is only available within the OSC Bridge application context. It is NOT available within the web browser!__
+__This API is only available within the bridge application context. It is NOT available within the web browser!__
 
-- ```window.localIP``` - returns the computer's current local IP address. Send OSC messages to port 4242 with this IP address to interface with your sketch! 
-  - You can also get your local IP address by running the app and entering ```ctrl-I```.
+### OSC
 
-### Sending OSC
+#### Sending OSC
 
-To send OSC messages from your sketch: ```OSC.send("<address>", <args>, "<IP_Addr>", <port>)```
-- ```<address>``` - a valid OSC message address, i.e. ```"/mousePosition"```
-- ```<args>``` - a string, number, boolean, or array of strings/numbers/bools
-  - Boolean arguments are converted to integers (0 or 1)
-- ```<IP_Addr>``` & ```<port>``` (optional) - destination IP address and port for the OSC message. Leave out for default ```"localhost"``` port 4243
+To send OSC messages from your sketch: ```Bridge.OSC.send(<data>, <IP_Addr>, <port>)```
+- ```<data>``` - a JavaScript object whose keys are OSC addresses and corresponding values are arrays of arguments, i.e. ```{"\position" : [1, 2, 3]}```
+  - Be sure to include the leading ```/``` in all OSC addresses!
+  - Array arguments can be numbers, strings or booleans (will be converted to ints: 0 or 1)
+  - An object with one key/value pair will be sent as a message. Object with multiple key/value pairs are sent as an OSC bundle.
+- ```<IP_Addr>``` & ```<port>``` (optional) - destination IP address and port for the OSC message.
 
-### Receiving OSC
+#### Receiving OSC
 
-Sketch receives OSC messages on port __4242__.
+- Create an OSC message handler with ```Bridge.OSC.begin(<port>)```
+  - ```<port>``` - the OSC port # to receive messages on
+- Use ```<handler>.route(<address>, <handler>)``` to handle incoming OSC messages 
+  - ```<address>``` - OSC address to route
+    - Use ```*``` as a single-level wildcard (e.g. ```/*/temperature``` will match addresses ```/device1/temperature```, ```/anything/temperature```, etc.)
+  - ```<handler>``` - a callback function with up to 2 arguments: ```(<args>, <address>)```
+    - ```<args>``` - an array of OSC message arguments (numbers or strings)
+    - ```<address>``` - the complete OSC message address
 
-Use ```OSC.route("<address>", <handler>)``` to create OSC message handlers
-- ```<address>``` - OSC address to route
-  - Use ```*``` as a single-level wildcard (e.g. ```/*/temperature``` will match addresses ```/device1/temperature```, ```/anything/temperature```, etc.)
-- ```<handler>``` - a callback function with up to 2 arguments: ```(vals, address)```
-  - ```vals``` - an array of arguments (numbers or strings)
-  - ```address``` - the full OSC message address, in case needed
+Send OSC messages to this device using the device's IP address and the port # used above. Use ```CTRL-I``` to show a pop-up with your device's current local IP address, or get it as a JavaScript string using ```Bridge.localIP```
+
+### Serial
+
+#### Connecting to a Serial port
+
+- Use ```Bridge.Serial.list()``` to return a Promise that resolves to an object containing the names and paths of available USB serial ports
+  - Object keys are serial port paths, object values are corresponding human-readable device names
+- Get a serial port handler object using ```Bridge.Serial.get(<path>)```, where ```<path>``` is the path to the serial port (should be an existing object key returned by ```Bridge.Serial.list()```)
+  - Beware! This function returns an object even if the path doesn't refer to an available serial port. Attempting to open an invalid serial port will cause an error.
+- Begin serial communication using ```<handler>.begin(<baudRate>)``` and your desired baudrate, defaulting to 9600. End the communication using ```<handler>.close()```.
+
+#### Receiving Serial messages
+- Use ```<handler>.onData(<callback>)``` to handle incoming serial data.
+  - ```<callback>```: a function that takes up to 2 arguments: ```<data>, <buffer>```
+    - ```<data>```: the message contents as a string, stripped of any leading/trailing whitespace
+    - ```<buffer>```: an array of message byte values (not stripped of whitespace but does NOT include the ```\r``` delimiter)
+
+#### Sending Serial messages
+- Use ```<handler>.send(<data>)``` to send data through the serial port
+  - ```<data>```: the data to send. Can be either a string, number or array of numbers.
+    - Strings will be ascii-encoded
+    - Numbers or arrays of numbers will be sent as raw byte values. To send a string representation of a number, i.e. "50", use ```String(<data>)``` instead.
+
 
 ## Examples
 
@@ -98,8 +125,8 @@ Example sketches are designed to work with free Zig Sim app on iOS and Android. 
   - Select frame rate (30 or 60 recommended)
 - Enter "start" tab to begin - smartphone must stay on with the Zig Sim app open!
 
-### OSC Log (default sketch)
-- Displays all incoming OSC message addresses + arguments in an on-screen table
+### OSC + Serial Message Log (default sketch)
+- Displays all incoming OSC message addresses + arguments and serial data in an on-screen table
 - See headers at top for computer's IP address. Use this IP address and port 4242 to send OSC messages to the sketch (from Zig Sim or other source)
 
 ### Etch-a-sketch

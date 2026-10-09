@@ -1,18 +1,27 @@
 import { contextBridge } from 'electron';
-import { SerialPort } from 'serialport';
-import { P5SerialPort } from './Serial';
-import { OSC } from './OSC';
+import { BridgeSerialPort } from './Serial';
+import { BridgeOSC } from './OSC';
 
-contextBridge.exposeInMainWorld('P5Local', {
-    serial: {
-        list: async () => SerialPort.list(),
+import os from 'os';
+
+const localIP = Object.values(os.networkInterfaces()).flat()
+  .filter((iface) => iface && iface.family === 'IPv4')
+  .map(iface => iface!.address)[0];
+
+contextBridge.exposeInMainWorld('Bridge', {
+    localIP,
+    Serial: {
+        list: async () => BridgeSerialPort.listPorts(),
         get: (path: string) => {
-            return P5SerialPort.get(path).public;
+            return BridgeSerialPort.get(path).public;
         }
     },
-    osc: {
+    OSC: {
         begin: (port: number) => {
-            return new OSC(port).public;
+            return new BridgeOSC(port).public;
+        },
+        send: (args: Record<string, any[]>, host: string, port: number) => {
+            BridgeOSC.send(host, port, args);
         }
     }
 });
