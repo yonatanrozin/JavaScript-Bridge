@@ -8,7 +8,7 @@ A simple program that runs static HTML/JavaScript files as full-screen desktop a
 
 ![](https://yonatanrozin.com/wp-content/uploads/2026/06/IMG_8374-1-2.gif)
 
-Read more about the project [here](https://yonatanrozin.com/project/osc-bridge/).
+Read more about the project [here](https://yonatanrozin.com/project/javascript-bridge/).
 
 ## Installation
 
@@ -19,7 +19,7 @@ Read more about the project [here](https://yonatanrozin.com/project/osc-bridge/)
 
 Tested on Windows 11, functional on Mac but needs testing
 
-- Download and install latest [release](https://github.com/yonatanrozin/OSC-Bridge/releases)
+- Download and install latest [release](https://github.com/yonatanrozin/javascript-bridge/releases)
   - Opening installed app for the first time may show security warning on Mac computers. After receiving warning, allow permission in "Privacy & Security" section of computer system preferences.
  
 ### Option 2 - build from source
@@ -134,7 +134,7 @@ Art-net is a communication standard for sending lighting cues over a local WiFi 
 
 __The Zig Sim mobile app (which most of the examples below use) was recently updated, including changes to the message OSC addresses. Be sure you are using the latest version of the Zig Sim app. The etch-a-sketch example is currently not working following the update. Fix coming soon! Rest of examples are functional.__
 
-See sketch examples [here](https://github.com/yonatanrozin/OSC-Bridge/blob/main/examples)
+See sketch examples [here](https://github.com/yonatanrozin/javascript-bridge/blob/main/examples)
 
 To try out an example sketch, copy the sketch files into the application sketch folder
 - Launch app and enter Ctrl-E (or cmd-E) to open the application sketch folder.
