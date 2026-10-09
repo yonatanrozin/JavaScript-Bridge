@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <title>JavaScript Bridge</title>
+  </head>
+  <body >
+    <h1>Cam to Artnet</h1>
+    <script>
+      const numLEDs = 20;
+
+      let video;
+      let strip;
+      
+      function setup() {
+        createCanvas(640, 480);
+        video = createCapture(VIDEO);
+        video.size(640, 480);
+        video.hide();
+
+        strip = createGraphics(numLEDs, 1);
+        strip.canvas.width = numLEDs; //this is necessary
+        strip.canvas.height = 1;
+      }
+
+      //gets pixel data (RGB, no A) from a horizontal strip of the canvas
+      function cnvToStrip(y) {
+        strip.image(get(0, y, width, 1), 0, 0, strip.width, strip.height);
+        strip.loadPixels();
+        const data = [];
+        for (let i = 0; i < strip.width; i++) {
+          data.push(
+            gammaCorrected(strip.pixels[i*4 + 0]), 
+            gammaCorrected(strip.pixels[i*4 + 1]), 
+            gammaCorrected(strip.pixels[i*4 + 2])
+          );
+        }
+        return data;
+      }
+
+      function gammaCorrected(num, gamma = 2.2) {
+        return Math.round(255 * Math.pow(num / 255, gamma));
+      }
+
+      function draw() {
+        image(video, 0, 0, width, height);
+        Bridge.ArtNet.send(cnvToStrip(height/2));
+      }
+    </script>
+  </body>
+</html>

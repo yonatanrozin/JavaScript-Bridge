@@ -1,7 +1,7 @@
 {
   "name": "javascript-bridge",
-  "version": "1.0.3",
-  "description": "A desktop environment for JavaScript-based applications that enables additional serial and TCP/IP-based communication.",
+  "version": "1.0.4",
+  "description": "A desktop environment for JavaScript-based applications such as P5 that enables additional serial and TCP/IP-based communication.",
   "license": "MIT",
   "author": "Yonatan Rozin",
   "type": "commonjs",
@@ -38,6 +38,7 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "artnet": "^1.4.0",
     "node-osc": "^11.7.1",
     "osc-js": "^2.4.1",
     "serialport": "^13.0.0"

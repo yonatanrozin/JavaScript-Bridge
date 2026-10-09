@@ -1,6 +1,8 @@
 import { contextBridge } from 'electron';
 import { BridgeSerialPort } from './Serial';
 import { BridgeOSC } from './OSC';
+import { BridgeArtNet } from './ArtNet';
+import { DmxData } from 'artnet';
 
 import os from 'os';
 
@@ -22,6 +24,11 @@ contextBridge.exposeInMainWorld('Bridge', {
         },
         send: (args: Record<string, any[]>, host: string, port: number) => {
             BridgeOSC.send(host, port, args);
+        }
+    },
+    ArtNet: {
+        send: (data: DmxData, universe: number = 0, start: number = 1, host?: string, port?: number) => {
+            BridgeArtNet.send(universe, start, data, host, port);
         }
     }
 });

@@ -53,11 +53,21 @@ To build multiple apps (eg. to manage several concurrent projects), each app mus
 - Use ```ctrl-R``` to refresh page
 - Use ```ctrl-I``` to show a pop-up with your computer's local IP address. Use this IP address when sending messages to this device over your local network!
 
+### Offline usage
+
+It may be beneficial or necessary to run a program on this app without internet connection. When doing so, ensure that any scripts loaded over the internet (usually in the head of an html file) are instead downloaded, placed in the sketch folder and referenced locally. It's recommended to use minified versions of script files when possible.
+
+For example, most of the provided code examples use p5.js, which is fetched by the html file with ```<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>```. To run the examples offline, the file should be downloaded (visit the https link in a web browser and save the file) and placed in the sketch folder, and the above line in the html should be replaced with ```<script src="./p5.js"></script>```.
+
+Naturally, any javascript functions that fetch data over the internet will not work offline.
+
 ## API
 
 __This API is only available within the bridge application context. It is NOT available within the web browser!__
 
 ### OSC
+
+OSC is a message syntax that allows labeled datapoints to be sent between devices and programs over a local WiFi or ethernet network. Most real-time multimedia programs are OSC-compatible.
 
 #### Sending OSC
 
@@ -83,6 +93,8 @@ Send OSC messages to this device using the device's IP address and the port # us
 
 ### Serial
 
+Serial communication allows bytes of data to be sent between your application and another device through a wired USB connection.
+
 #### Connecting to a Serial port
 
 - Use ```Bridge.Serial.list()``` to return a Promise that resolves to an object containing the names and paths of available USB serial ports
@@ -103,6 +115,20 @@ Send OSC messages to this device using the device's IP address and the port # us
     - Strings will be ascii-encoded
     - Numbers or arrays of numbers will be sent as raw byte values. To send a string representation of a number, i.e. "50", use ```String(<data>)``` instead.
 
+### Art-net
+
+Art-net is a communication standard for sending lighting cues over a local WiFi or ethernet network.
+
+#### Sending Art-net
+
+- Use ```Bridge.ArtNet.send(<data>, <universe>, <startChannel>, <host>, <port>)```
+  - ```<data>```: an array of channel values, usually used for RGB color data.
+    - Channel values are either ints 0-255, but can also be ```null``` to avoid updating that specific channel value on the receiving end.
+  - ```<universe>```: the Art-net "universe" to send the data to. Default 0, but some receivers may be expecting universe #1 by default instead.
+    - Each universe can hold up to 512 channels. If you need more than 512 channels you should use multiple universes.
+  - ```<startChannel>```: the channel number the first value in ```<data>``` should be sent to. Each subsequent data value will be sent to the next channel number. Default is channel 1.
+  - ```<host>```: the IP address of the receiver device. Default is ```255.255.255.255```, the UDP broadcast address which will send the message to ALL devices on your network.
+  - ```<port>```: the port the receiver device is listening for messages on. Default is Art-net port 6454.
 
 ## Examples
 
